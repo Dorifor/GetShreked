@@ -1,6 +1,5 @@
-import Renderer.WINDOW_HEIGHT
-import Renderer.WINDOW_WIDTH
-import java.awt.Color
+import GameBoard.WINDOW_HEIGHT
+import GameBoard.WINDOW_WIDTH
 import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 import java.io.File
@@ -9,6 +8,8 @@ import javax.imageio.ImageIO
 class Hero(var posX: Int, var posY: Int, var size: Int) {
     val speed = 10 // Max distance per tick
     var coins = 0
+    var health = 50
+    var experience = 0
 
     val sprite: BufferedImage = ImageIO.read(File("src/main/resources/shrok.png"))
 
@@ -22,11 +23,10 @@ class Hero(var posX: Int, var posY: Int, var size: Int) {
 //        g.fillOval( centerX - 10, centerY - 10, 20, 20)
 //        g.color = Color.red
 //        g.fillOval( centerX - 5, centerY - 5, 10, 10)
-
         g.drawImage(sprite, centerX - 16, centerY - 16, null)
     }
 
-    fun isColliding(e: Enemy): Boolean {
+    fun isColliding(e: Pickable): Boolean {
         // Computes the distance between the hero and the enemy
         val distance = Math.sqrt(Math.pow((posX - e.posX).toDouble(), 2.0) + Math.pow((posY - e.posY).toDouble(), 2.0))
         // If the distance is less than the sum of the radius, the hero is colliding with the enemy
@@ -45,6 +45,7 @@ class Hero(var posX: Int, var posY: Int, var size: Int) {
     fun moveRight() {
         posX += speed
     }
+
     fun moveUpLeft() {
         val speedX = speed * Math.cos(Math.PI / 4)
         val speedY = speed * Math.sin(Math.PI / 4)

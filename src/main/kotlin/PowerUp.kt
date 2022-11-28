@@ -1,0 +1,1 @@
+data class PowerUp(val id: Int, val name: String, val description: String, val unlocked: Boolean = false)

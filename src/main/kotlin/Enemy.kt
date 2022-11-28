@@ -1,13 +1,45 @@
-import Renderer.WINDOW_HEIGHT
-import Renderer.WINDOW_WIDTH
 import java.awt.Color
-import java.awt.Graphics2D
+import java.awt.image.BufferedImage
 
-class Enemy(val posX: Int, val posY: Int, val size: Int, val color: Color) {
-    fun draw(heroX: Int, heroY: Int, g: Graphics2D) {
-        g.color = color
-        g.fillOval(posX - heroX + WINDOW_WIDTH / 2 - size / 2, posY - heroY + WINDOW_HEIGHT / 2 - size / 2, size, size)
-        g.color = Color.black
+abstract class Enemy(
+    val posX: Int,
+    val posY: Int,
+    var health: Int,
+    var damage: Int,
+    var speed: Double,
+    var size: Double,
+    val sprite: BufferedImage,
+    val attackInterval: Double
+) {
+    fun calculateTrajectory() {
+
     }
 
+    fun attack() {
+
+    }
 }
+
+class BossEnemy(
+    posX: Int,
+    posY: Int,
+    health: Int,
+    damage: Int,
+    speed: Double,
+    size: Double,
+    sprite: BufferedImage,
+    attackInterval: Double
+) : Enemy(posX, posY, damage, health, speed, size, sprite, attackInterval)
+
+
+class BaseEnemy(
+    posX: Int,
+    posY: Int,
+    health: Int,
+    damage: Int,
+    speed: Double,
+    size: Double,
+    sprite: BufferedImage,
+    attackInterval: Double,
+    color: Color
+) : Enemy(posX, posY, damage, health, speed, size, sprite, attackInterval)
