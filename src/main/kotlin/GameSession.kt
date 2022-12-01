@@ -1,43 +1,41 @@
 import java.awt.*
-import java.awt.event.ActionEvent
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.awt.image.BufferedImage
 import java.io.File
 import java.time.LocalDateTime
-import java.util.*
 import javax.imageio.ImageIO
 import javax.swing.JFrame
 import javax.swing.JPanel
 import kotlin.random.Random
 
-class GameSession(val date: LocalDateTime, val map: Map) : JPanel() {
+class GameSession(val date: LocalDateTime, var map: Map) : JPanel() {
     var timeAlive: Int = 0
-    var experience: Int = 0
-    var level: Int = 0
-    var money: Int = 0
     var enemiesBeaten: Int = 0
     var bossesBeaten: Int = 0
-    var posX: Int = 0
-    var posY: Int = 0
     var speedFactor: Double = 1.0
-    val gameSessions = mutableListOf<GameSession>()
-    val LIMIT = 1012
-
+    private var limit = 1012
 
     var upPressed = false
     var downPressed = false
     var leftPressed = false
     var rightPressed = false
-    val pickables = mutableListOf<Pickable>()
-    val hero = Hero(0, 0, 30)
 
-    val ground: BufferedImage = ImageIO.read(File("src/main/resources/mapx2v2.png"))
-    val tree: BufferedImage = ImageIO.read(File("src/main/resources/tree.png"))
+    private val pickables = mutableListOf<Pickable>()
+    private val attacks = mutableListOf<Attack>()
+    private val hero = Hero(0, 0, 30)
+
+    private val tree: BufferedImage = ImageIO.read(File("src/main/resources/tree.png"))
 
     fun initGame(f: JFrame) {
+        limit = if (map.limit > 0) map.limit else limit
         createEnnemies()
+        createAttacks()
+
         this.pickables.addAll(pickables)
+
+        hero.attacks.add(attacks[0])
+        hero.attacks[0].initAttack(hero)
 
         // Set up key event handler
         f.addKeyListener(object : KeyAdapter() {
@@ -62,28 +60,40 @@ class GameSession(val date: LocalDateTime, val map: Map) : JPanel() {
         })
     }
 
+    private fun createAttacks() {
+        attacks.add(StaticAttack("static", "it is a static attack that will stay where it has been launched", 1, 10, 5000))
+    }
+
 
     private fun createEnnemies() {
         val entities = mutableListOf<Pickable>()
         for (i in 1..30) {
-            entities.add(MoneyPickable(Random.nextInt(-LIMIT, LIMIT), Random.nextInt(-LIMIT, LIMIT)))
-            entities.add(FoodPickable(Random.nextInt(-LIMIT, LIMIT), Random.nextInt(-LIMIT, LIMIT)))
-            entities.add(ExperiencePickable(Random.nextInt(-LIMIT, LIMIT), Random.nextInt(-LIMIT, LIMIT)))
+            entities.add(MoneyPickable(Random.nextInt(-limit, limit), Random.nextInt(-limit, limit)))
+            entities.add(FoodPickable(Random.nextInt(-limit, limit), Random.nextInt(-limit, limit)))
+            entities.add(ExperiencePickable(Random.nextInt(-limit, limit), Random.nextInt(-limit, limit)))
         }
         this.pickables.addAll(entities)
     }
 
     fun stepGame() {
+        hero.attacks.forEach { it.checkCollisions(hero) }
         repaint()
     }
 
     fun drawDebug(g: Graphics) {
+        val debugs = listOf(
+            "hero: ${hero.posX}, ${hero.posY}",
+            "coins: ${hero.coins}",
+            "health: ${hero.health}",
+            "experience: ${hero.experience}",
+            "map: ${map.name} (${limit})"
+        )
+
+
         g.color = Color.white
-        g.drawString("hero: ${hero.posX}, ${hero.posY}", 10, 10)
-        g.drawString("coins: ${hero.coins}", 10, 20)
-        g.drawString("health: ${hero.health}", 10, 30)
-        g.drawString("experience: ${hero.experience}", 10, 40)
-        g.drawString("LIMIT: ${LIMIT}", 10, 50)
+        debugs.forEachIndexed { i, s ->
+            g.drawString(s, 15, 20 * (i + 1))
+        }
         g.color = Color.black
     }
 
@@ -93,9 +103,9 @@ class GameSession(val date: LocalDateTime, val map: Map) : JPanel() {
         val g = gg as Graphics2D
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         g.drawImage(
-            ground,
-            0 - hero.posX + GameBoard.WINDOW_WIDTH / 2 - ground.width / 2,
-            0 - hero.posY + GameBoard.WINDOW_HEIGHT / 2 - ground.height / 2,
+            map.image,
+            0 - hero.posX + GameBoard.WINDOW_WIDTH / 2 - map.image.width / 2,
+            0 - hero.posY + GameBoard.WINDOW_HEIGHT / 2 - map.image.height / 2,
             null
         )
 
@@ -132,8 +142,8 @@ class GameSession(val date: LocalDateTime, val map: Map) : JPanel() {
             // Invalid moves
         }
 
-        hero.posX = hero.posX.coerceIn(-LIMIT, LIMIT)
-        hero.posY = hero.posY.coerceIn(-LIMIT, LIMIT)
+        hero.posX = hero.posX.coerceIn(-limit, limit)
+        hero.posY = hero.posY.coerceIn(-limit, limit)
 
         // Check if the hero is in collision with an enemy
         val picked = pickables.filter { hero.isColliding(it) }
