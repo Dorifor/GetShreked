@@ -34,7 +34,7 @@ object GameBoard : JPanel() {
             val frame = JFrame()
             with(frame) {
                 defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-                title = "Get Shreked"
+                title = "Get Shreked - $playerName"
                 isResizable = false
                 add(this@GameBoard, BorderLayout.CENTER)
                 pack()
