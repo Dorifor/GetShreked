@@ -18,6 +18,10 @@ abstract class Enemy(
     fun attack() {
 
     }
+
+    open fun hurt(damage: Int) {
+
+    }
 }
 
 class BossEnemy(

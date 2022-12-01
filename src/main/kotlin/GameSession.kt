@@ -35,7 +35,9 @@ class GameSession(val date: LocalDateTime, var map: Map) : JPanel() {
         this.pickables.addAll(pickables)
 
         hero.attacks.add(attacks[0])
+        hero.attacks.add(attacks[1])
         hero.attacks[0].initAttack(hero)
+        hero.attacks[1].initAttack(hero)
 
         // Set up key event handler
         f.addKeyListener(object : KeyAdapter() {
@@ -61,7 +63,8 @@ class GameSession(val date: LocalDateTime, var map: Map) : JPanel() {
     }
 
     private fun createAttacks() {
-        attacks.add(StaticAttack("static", "it is a static attack that will stay where it has been launched", 1, 10, 5000))
+        attacks.add(StaticAttack("static", "a static attack that will stay where it has been launched", 1, 10, 6000))
+        attacks.add(AreaOfEffectAttack("aoe", "an aoe attack that will draw an area around the player", 1, 10, 3500))
     }
 
 
@@ -76,7 +79,7 @@ class GameSession(val date: LocalDateTime, var map: Map) : JPanel() {
     }
 
     fun stepGame() {
-        hero.attacks.forEach { it.checkCollisions(hero) }
+        hero.attacks.forEach { att ->  }
         repaint()
     }
 
