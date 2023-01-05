@@ -24,7 +24,7 @@ class GameSession(val date: LocalDateTime, var map: Map) : JPanel() {
     private val pickables = mutableListOf<Pickable>()
     private val enemies = mutableListOf<Enemy>()
     private val attacks = mutableListOf<Attack>()
-    private val hero = Hero(Vector(0, 0), 30)
+    private val hero = Hero(Vector(0, 0), 32)
 
     // RESSOURCES
     private val treeRessource: BufferedImage = ImageIO.read(File("src/main/resources/tree.png"))
@@ -81,13 +81,28 @@ class GameSession(val date: LocalDateTime, var map: Map) : JPanel() {
     }
 
     private fun createEnemies() {
-        for (i in 1..5) {
-            enemies.add(BaseEnemy(Vector(Random.nextInt(100), Random.nextInt(100)), 100, 10, 10.0, 20, enemyRessource, 1.0, Color.RED))
+        for (i in 1..50) {
+            enemies.add(
+                BaseEnemy(
+                    Vector(Random.nextInt(-limit, limit), Random.nextInt(-limit, limit)),
+                    100,
+                    10,
+                    3.5,
+                    20,
+                    enemyRessource,
+                    1.0,
+                    Color.RED
+                )
+            )
         }
     }
 
     fun stepGame() {
-        hero.attacks.forEach { att ->  }
+        hero.attacks.forEach { att ->
+            enemies.forEach { en ->
+                if (att.checkCollisions(en)) en.hurt(att.damage)
+            }
+        }
         repaint()
     }
 
@@ -132,8 +147,9 @@ class GameSession(val date: LocalDateTime, var map: Map) : JPanel() {
         // Draw the hero
         hero.draw(g)
 
-        enemies.forEach {enemy ->
+        enemies.forEach { enemy ->
             enemy.moveToHero(hero)
+            enemy.manageCollisions(enemies.filter { it != enemy })
             enemy.draw(g, hero)
         }
 

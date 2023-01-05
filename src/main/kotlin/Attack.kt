@@ -38,7 +38,7 @@ abstract class Attack(
         return sqrt((x2 - x1).toDouble().pow(2.0) + (y2 - y1).toDouble().pow(2.0))
     }
 
-    abstract fun checkCollisions(enemy: Enemy)
+    abstract fun checkCollisions(enemy: Enemy) : Boolean
 
     abstract fun launchAttack(hero: Hero)
 
@@ -50,10 +50,8 @@ class AreaOfEffectAttack(name: String, description: String, level: Int, damage: 
     val size: Int = 72;
     var currentSize = 0
 
-    override fun checkCollisions(enemy: Enemy) {
-        if (frameCount % 30 == 0 && calculateDistance(posX, posY, enemy.pos.x, enemy.pos.y) <= currentSize) {
-            enemy.health -= damage
-        }
+    override fun checkCollisions(enemy: Enemy) : Boolean {
+        return (frameCount % 15 == 0 && calculateDistance(posX, posY, enemy.pos.x, enemy.pos.y) <= currentSize)
     }
 
     override fun launchAttack(hero: Hero) {
@@ -86,10 +84,8 @@ class StaticAttack(name: String, description: String, level: Int, damage: Int, c
     val size: Int = 64;
     var currentSize = 0
 
-    override fun checkCollisions(enemy: Enemy) {
-        if (frameCount % 30 == 0 && calculateDistance(posX, posY, enemy.pos.y, enemy.pos.y) <= currentSize) {
-            enemy.health -= damage
-        }
+    override fun checkCollisions(enemy: Enemy) : Boolean {
+        return (frameCount % 30 == 0 && calculateDistance(posX, posY, enemy.pos.y, enemy.pos.y) <= currentSize)
     }
 
     override fun launchAttack(hero: Hero) {

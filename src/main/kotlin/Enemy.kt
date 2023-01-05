@@ -3,6 +3,7 @@ import GameBoard.WINDOW_WIDTH
 import java.awt.Color
 import java.awt.Graphics
 import java.awt.image.BufferedImage
+import kotlin.random.Random
 
 abstract class Enemy(
     val pos: Vector,
@@ -14,12 +15,33 @@ abstract class Enemy(
     val attackInterval: Double
 ) {
     fun moveToHero(hero: Hero) {
-        val vel = hero.pos.copy()
-        vel.sub(pos)
-        print("${vel.x}, ${vel.y}")
-        vel.limit(4.5)
-        println(" === ${vel.x}, ${vel.y}")
+        val force = hero.pos.copy()
+//        force.x += Random.nextInt(-50, 50)
+//        force.y += Random.nextInt(-50, 50)
+        force.sub(pos)
+        force.setMag(speed / 2)
+        if (pos.dist(hero.pos) <= hero.size / 1.5 + size / 2) {
+            force.setMag(0.0)
+        }
+        pos.add(force)
+    }
+
+    fun manageCollisions(enemies: List<Enemy>) {
+        return
+        val vel = Vector(0, 0)
+        enemies.forEach { en ->
+            if (isCollidingWithEnemy(en)) {
+                val force = pos.copy()
+                force.sub(en.pos)
+                force.normalize()
+                vel.add(force)
+            }
+        }
         pos.add(vel)
+    }
+
+    fun isCollidingWithEnemy(enemy: Enemy) : Boolean {
+        return pos.dist(enemy.pos) <= size / 1.5 + enemy.size / 2
     }
 
     fun attack() {
@@ -27,7 +49,7 @@ abstract class Enemy(
     }
 
     open fun hurt(damage: Int) {
-        //    TODO))
+        //    TODO
     }
 
     open fun draw(graphics: Graphics, hero: Hero) {
