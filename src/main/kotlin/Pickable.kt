@@ -17,10 +17,12 @@ class MoneyPickable(posX: Int, posY: Int, color: Color = Color.orange) : Pickabl
     override val size = 10
 }
 
-class ExperiencePickable(posX: Int, posY: Int, amount: Int = 1, color: Color = Color.green) : Pickable(posX, posY, color) {
+class ExperiencePickable(posX: Int, posY: Int, amount: Int = 1, color: Color = Color.green) :
+    Pickable(posX, posY, color) {
     override val size = 6
 }
 
-class FoodPickable(posX: Int, posY: Int, color: Color = Color.DARK_GRAY, val regen: Int = 10) : Pickable(posX, posY, color) {
+class FoodPickable(posX: Int, posY: Int, color: Color = Color.DARK_GRAY, val regen: Int = 10) :
+    Pickable(posX, posY, color) {
     override val size = 12
 }

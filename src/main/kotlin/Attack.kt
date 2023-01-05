@@ -51,7 +51,7 @@ class AreaOfEffectAttack(name: String, description: String, level: Int, damage: 
     var currentSize = 0
 
     override fun checkCollisions(enemy: Enemy) {
-        if (frameCount % 30 == 0 && calculateDistance(posX, posY, enemy.posX, enemy.posY) <= currentSize) {
+        if (frameCount % 30 == 0 && calculateDistance(posX, posY, enemy.pos.x, enemy.pos.y) <= currentSize) {
             enemy.health -= damage
         }
     }
@@ -59,7 +59,7 @@ class AreaOfEffectAttack(name: String, description: String, level: Int, damage: 
     override fun launchAttack(hero: Hero) {
         frameCount = 0
         state = AttackState.RUNNING
-        println("started again: $cooldownMillisec")
+        // println("started again: $cooldownMillisec")
     }
 
     override fun draw(hero: Hero, graphics: Graphics) {
@@ -74,7 +74,7 @@ class AreaOfEffectAttack(name: String, description: String, level: Int, damage: 
 
         if (currentSize <= 1 && frameCount > 10) {
             state = AttackState.STOPPED
-            println("stopped: $state")
+            // println("stopped: $state")
         }
     }
 }
@@ -87,15 +87,15 @@ class StaticAttack(name: String, description: String, level: Int, damage: Int, c
     var currentSize = 0
 
     override fun checkCollisions(enemy: Enemy) {
-        if (frameCount % 30 == 0 && calculateDistance(posX, posY, enemy.posX, enemy.posY) <= currentSize) {
+        if (frameCount % 30 == 0 && calculateDistance(posX, posY, enemy.pos.y, enemy.pos.y) <= currentSize) {
             enemy.health -= damage
         }
     }
 
     override fun launchAttack(hero: Hero) {
         frameCount = 0
-        posX = hero.posX
-        posY = hero.posY
+        posX = hero.pos.x
+        posY = hero.pos.y
     }
 
     override fun draw(hero: Hero, graphics: Graphics) {
@@ -103,7 +103,7 @@ class StaticAttack(name: String, description: String, level: Int, damage: Int, c
         currentSize = (frameCount * 2).coerceIn(0..size)
         val redAmount = (0..size).convert(currentSize, (0..200))
         graphics.color = Color(200, 255 - redAmount, 255 - redAmount)
-        graphics.fillOval(posX - hero.posX + WINDOW_WIDTH / 2 - currentSize / 2, posY - hero.posY + WINDOW_HEIGHT / 2 - currentSize / 2, currentSize, currentSize)
+        graphics.fillOval(posX - hero.pos.x + WINDOW_WIDTH / 2 - currentSize / 2, posY - hero.pos.y + WINDOW_HEIGHT / 2 - currentSize / 2, currentSize, currentSize)
         graphics.color = Color.BLACK
     }
 }

@@ -22,14 +22,18 @@ class GameSession(val date: LocalDateTime, var map: Map) : JPanel() {
     var rightPressed = false
 
     private val pickables = mutableListOf<Pickable>()
+    private val enemies = mutableListOf<Enemy>()
     private val attacks = mutableListOf<Attack>()
-    private val hero = Hero(0, 0, 30)
+    private val hero = Hero(Vector(0, 0), 30)
 
-    private val tree: BufferedImage = ImageIO.read(File("src/main/resources/tree.png"))
+    // RESSOURCES
+    private val treeRessource: BufferedImage = ImageIO.read(File("src/main/resources/tree.png"))
+    private val enemyRessource: BufferedImage = ImageIO.read(File("src/main/resources/base_enemy.png"))
 
     fun initGame(f: JFrame) {
         limit = if (map.limit > 0) map.limit else limit
-        createEnnemies()
+        createPickables()
+        createEnemies()
         createAttacks()
 
         this.pickables.addAll(pickables)
@@ -68,14 +72,18 @@ class GameSession(val date: LocalDateTime, var map: Map) : JPanel() {
     }
 
 
-    private fun createEnnemies() {
-        val entities = mutableListOf<Pickable>()
+    private fun createPickables() {
         for (i in 1..30) {
-            entities.add(MoneyPickable(Random.nextInt(-limit, limit), Random.nextInt(-limit, limit)))
-            entities.add(FoodPickable(Random.nextInt(-limit, limit), Random.nextInt(-limit, limit)))
-            entities.add(ExperiencePickable(Random.nextInt(-limit, limit), Random.nextInt(-limit, limit)))
+            pickables.add(MoneyPickable(Random.nextInt(-limit, limit), Random.nextInt(-limit, limit)))
+            pickables.add(FoodPickable(Random.nextInt(-limit, limit), Random.nextInt(-limit, limit)))
+            pickables.add(ExperiencePickable(Random.nextInt(-limit, limit), Random.nextInt(-limit, limit)))
         }
-        this.pickables.addAll(entities)
+    }
+
+    private fun createEnemies() {
+        for (i in 1..5) {
+            enemies.add(BaseEnemy(Vector(Random.nextInt(100), Random.nextInt(100)), 100, 10, 10.0, 20, enemyRessource, 1.0, Color.RED))
+        }
     }
 
     fun stepGame() {
@@ -85,7 +93,7 @@ class GameSession(val date: LocalDateTime, var map: Map) : JPanel() {
 
     fun drawDebug(g: Graphics) {
         val debugs = listOf(
-            "hero: ${hero.posX}, ${hero.posY}",
+            "hero: ${hero.pos.x}, ${hero.pos.y}",
             "coins: ${hero.coins}",
             "health: ${hero.health}",
             "experience: ${hero.experience}",
@@ -107,22 +115,27 @@ class GameSession(val date: LocalDateTime, var map: Map) : JPanel() {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         g.drawImage(
             map.image,
-            0 - hero.posX + GameBoard.WINDOW_WIDTH / 2 - map.image.width / 2,
-            0 - hero.posY + GameBoard.WINDOW_HEIGHT / 2 - map.image.height / 2,
+            0 - hero.pos.x + GameBoard.WINDOW_WIDTH / 2 - map.image.width / 2,
+            0 - hero.pos.y + GameBoard.WINDOW_HEIGHT / 2 - map.image.height / 2,
             null
         )
 
         g.drawImage(
-            tree,
-            0 - hero.posX + GameBoard.WINDOW_WIDTH / 2 - tree.width / 2,
-            0 - hero.posY + GameBoard.WINDOW_HEIGHT / 2 - tree.height / 2,
+            treeRessource,
+            0 - hero.pos.x + GameBoard.WINDOW_WIDTH / 2 - treeRessource.width / 2,
+            0 - hero.pos.y + GameBoard.WINDOW_HEIGHT / 2 - treeRessource.height / 2,
             null
         )
 
         // Draw the ennemies
-        pickables.forEach { it.draw(hero.posX, hero.posY, g) }
+        pickables.forEach { it.draw(hero.pos.x, hero.pos.y, g) }
         // Draw the hero
         hero.draw(g)
+
+        enemies.forEach {enemy ->
+            enemy.moveToHero(hero)
+            enemy.draw(g, hero)
+        }
 
         // Move the Hero
         if (upPressed && leftPressed) {
@@ -145,8 +158,8 @@ class GameSession(val date: LocalDateTime, var map: Map) : JPanel() {
             // Invalid moves
         }
 
-        hero.posX = hero.posX.coerceIn(-limit, limit)
-        hero.posY = hero.posY.coerceIn(-limit, limit)
+        hero.pos.x = hero.pos.x.coerceIn(-limit, limit)
+        hero.pos.y = hero.pos.y.coerceIn(-limit, limit)
 
         // Check if the hero is in collision with an enemy
         val picked = pickables.filter { hero.isColliding(it) }

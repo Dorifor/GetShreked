@@ -9,7 +9,7 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-class Hero(var posX: Int, var posY: Int, var size: Int) {
+class Hero(val pos: Vector, var size: Int) {
     val speed = 10 // Max distance per tick
     var coins = 0
     var health = 50
@@ -29,46 +29,38 @@ class Hero(var posX: Int, var posY: Int, var size: Int) {
 
     fun isColliding(e: Pickable): Boolean {
         // Computes the distance between the hero and the enemy
-        val distance = sqrt((posX - e.posX).toDouble().pow(2.0) + (posY - e.posY).toDouble().pow(2.0))
+        val distance = sqrt((pos.x - e.posX).toDouble().pow(2.0) + (pos.y - e.posY).toDouble().pow(2.0))
         // If the distance is less than the sum of the radius, the hero is colliding with the enemy
         return distance < (size / 2 + e.size / 2)
     }
 
     fun moveUp() {
-        posY -= speed
+        pos.sub(Vector(0, speed))
     }
     fun moveDown() {
-        posY += speed
+        pos.add(Vector(0, speed))
     }
     fun moveLeft() {
-        posX -= speed
+        pos.sub(Vector(speed, 0))
     }
     fun moveRight() {
-        posX += speed
+        pos.add(Vector(speed, 0))
     }
 
     fun moveUpLeft() {
-        val speedX = speed * cos(Math.PI / 4)
-        val speedY = speed * sin(Math.PI / 4)
-        posX -= speedX.toInt()
-        posY -= speedY.toInt()
+        val diagSpeed = (speed * cos(Math.PI / 4)).toInt()
+        pos.add(Vector(-diagSpeed, -diagSpeed))
     }
     fun moveUpRight() {
-        val speedX = speed * cos(Math.PI / 4)
-        val speedY = speed * sin(Math.PI / 4)
-        posX += speedX.toInt()
-        posY -= speedY.toInt()
+        val diagSpeed = (speed * cos(Math.PI / 4)).toInt()
+        pos.add(Vector(diagSpeed, -diagSpeed))
     }
     fun moveDownLeft() {
-        val speedX = speed * cos(Math.PI / 4)
-        val speedY = speed * sin(Math.PI / 4)
-        posX -= speedX.toInt()
-        posY += speedY.toInt()
+        val diagSpeed = (speed * cos(Math.PI / 4)).toInt()
+        pos.add(Vector(-diagSpeed, diagSpeed))
     }
     fun moveDownRight() {
-        val speedX = speed * cos(Math.PI / 4)
-        val speedY = speed * sin(Math.PI / 4)
-        posX += speedX.toInt()
-        posY += speedY.toInt()
+        val diagSpeed = (speed * cos(Math.PI / 4)).toInt()
+        pos.add(Vector(diagSpeed, diagSpeed))
     }
 }

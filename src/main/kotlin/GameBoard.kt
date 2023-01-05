@@ -48,6 +48,7 @@ object GameBoard : JPanel() {
 
     private fun initGamesession(frame: JFrame, map: Map) {
         val session = GameSession(LocalDateTime.now(), map)
+        gameSessions.add(session)
 
         frame.contentPane = session
 
