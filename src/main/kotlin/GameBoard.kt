@@ -23,6 +23,9 @@ object GameBoard : JPanel() {
 
     var PAUSED = false
 
+    private val ravieFontResource = Font.createFont(Font.TRUETYPE_FONT, File("src/main/resources/RAVIE.TTF"))
+    private val bauhsFontResource = Font.createFont(Font.TRUETYPE_FONT, File("src/main/resources/BAUHS93.TTF"))
+
     init {
         preferredSize = Dimension(WINDOW_WIDTH, WINDOW_HEIGHT)
         background = Color.white
@@ -40,13 +43,14 @@ object GameBoard : JPanel() {
                 pack()
                 setLocationRelativeTo(null)
                 isVisible = true
+                font = bauhsFontResource
             }
 
-            initGamesession(frame, maps[0])
+            initGameSession(frame, maps[0])
         }
     }
 
-    private fun initGamesession(frame: JFrame, map: Map) {
+    private fun initGameSession(frame: JFrame, map: Map) {
         val session = GameSession(LocalDateTime.now(), map)
         gameSessions.add(session)
 
@@ -58,6 +62,7 @@ object GameBoard : JPanel() {
             override fun keyPressed(e: KeyEvent) {
                 when (e.keyCode) {
                     KeyEvent.VK_O -> session.map = if (session.map == maps[0]) maps[1] else maps[0]
+                    KeyEvent.VK_F -> frame.font = if (frame.font == ravieFontResource) bauhsFontResource else ravieFontResource
                 }
             }
         })

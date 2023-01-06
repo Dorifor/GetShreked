@@ -3,6 +3,7 @@ import GameBoard.WINDOW_WIDTH
 import java.awt.Color
 import java.awt.Graphics
 import javax.swing.Timer
+import kotlin.math.ceil
 import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -20,8 +21,7 @@ abstract class Attack(
     val cooldownMillisec: Int = 1500
 ) {
     var frameCount = 0
-    var posX = 0
-    var posY = 0
+    var pos = Vector(0.0, 0.0)
     var state: AttackState = AttackState.STOPPED
 
     fun initAttack(hero: Hero) {
@@ -38,7 +38,7 @@ abstract class Attack(
         return sqrt((x2 - x1).toDouble().pow(2.0) + (y2 - y1).toDouble().pow(2.0))
     }
 
-    abstract fun checkCollisions(enemy: Enemy) : Boolean
+    abstract fun checkCollisions(enemy: Enemy, hero: Hero): Boolean
 
     abstract fun launchAttack(hero: Hero)
 
@@ -47,11 +47,12 @@ abstract class Attack(
 
 class AreaOfEffectAttack(name: String, description: String, level: Int, damage: Int, cooldownMillisec: Int) :
     Attack(name, description, level, damage, cooldownMillisec) {
-    val size: Int = 72;
+    val size: Int = 96;
     var currentSize = 0
+    var frameLength = 120
 
-    override fun checkCollisions(enemy: Enemy) : Boolean {
-        return (frameCount % 15 == 0 && calculateDistance(posX, posY, enemy.pos.x, enemy.pos.y) <= currentSize)
+    override fun checkCollisions(enemy: Enemy, hero: Hero): Boolean {
+        return (frameCount % 5 == 0 && ceil(hero.pos.dist(enemy.pos)) <= currentSize && state == AttackState.RUNNING)
     }
 
     override fun launchAttack(hero: Hero) {
@@ -64,13 +65,20 @@ class AreaOfEffectAttack(name: String, description: String, level: Int, damage: 
         if (state == AttackState.STOPPED) return
 
         frameCount++
-        currentSize = (frameCount * sin(frameCount.toDouble() / 10) * 5).toInt().coerceIn(0..size)
+//        currentSize = (sin((0..frameLength).convert(frameCount, (0..Math.PI.toInt())).toDouble()) * 5).toInt().coerceIn(0..size)
+        currentSize = (size * sin(((1.0 / 19) * frameCount))).toInt().coerceIn(0..size)
+//        println("currentSize: $currentSize ")
         val greenAmount = (0..size).convert(currentSize, (0..200))
         graphics.color = Color(255 - greenAmount, 200, 255 - greenAmount)
-        graphics.fillOval(WINDOW_WIDTH / 2 - currentSize / 2, WINDOW_HEIGHT / 2 - currentSize / 2, currentSize, currentSize)
+        graphics.fillOval(
+            WINDOW_WIDTH / 2 - currentSize / 2,
+            WINDOW_HEIGHT / 2 - currentSize / 2,
+            currentSize,
+            currentSize
+        )
         graphics.color = Color.BLACK
 
-        if (currentSize <= 1 && frameCount > 10) {
+        if (currentSize <= 1 && frameCount > frameLength) {
             state = AttackState.STOPPED
             // println("stopped: $state")
         }
@@ -81,25 +89,30 @@ class StaticAttack(name: String, description: String, level: Int, damage: Int, c
     name, description, level,
     damage, cooldownMillisec
 ) {
-    val size: Int = 64;
+    val size: Int = 128;
     var currentSize = 0
 
-    override fun checkCollisions(enemy: Enemy) : Boolean {
-        return (frameCount % 30 == 0 && calculateDistance(posX, posY, enemy.pos.y, enemy.pos.y) <= currentSize)
+    override fun checkCollisions(enemy: Enemy, hero: Hero): Boolean {
+        return (frameCount % 30 == 0 && ceil(pos.dist(enemy.pos)) <= currentSize)
     }
 
     override fun launchAttack(hero: Hero) {
         frameCount = 0
-        posX = hero.pos.x
-        posY = hero.pos.y
+        pos.x = hero.pos.x
+        pos.y = hero.pos.y
     }
 
     override fun draw(hero: Hero, graphics: Graphics) {
         frameCount++
-        currentSize = (frameCount * 2).coerceIn(0..size)
+        currentSize = (frameCount * 10).coerceIn(0..size)
         val redAmount = (0..size).convert(currentSize, (0..200))
         graphics.color = Color(200, 255 - redAmount, 255 - redAmount)
-        graphics.fillOval(posX - hero.pos.x + WINDOW_WIDTH / 2 - currentSize / 2, posY - hero.pos.y + WINDOW_HEIGHT / 2 - currentSize / 2, currentSize, currentSize)
+        graphics.fillOval(
+            pos.x.toInt() - hero.pos.x.toInt() + WINDOW_WIDTH / 2 - currentSize / 2,
+            pos.y.toInt() - hero.pos.y.toInt() + WINDOW_HEIGHT / 2 - currentSize / 2,
+            currentSize,
+            currentSize
+        )
         graphics.color = Color.BLACK
     }
 }

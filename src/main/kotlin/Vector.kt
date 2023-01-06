@@ -3,7 +3,7 @@ import kotlin.math.ceil
 import kotlin.math.sign
 import kotlin.math.sqrt
 
-data class Vector(var x: Int, var y: Int) {
+data class Vector(var x: Double, var y: Double) {
     fun add(vector: Vector) {
         x += vector.x
         y += vector.y
@@ -17,8 +17,8 @@ data class Vector(var x: Int, var y: Int) {
     fun mult(m: Double) {
         val sx = sign(x.toDouble())
         val sy = sign(y.toDouble())
-        x = (ceil(abs(x) * m) * sx).toInt()
-        y = (ceil(abs(y) * m) * sy).toInt()
+        x = (ceil(abs(x) * m) * sx)
+        y = (ceil(abs(y) * m) * sy)
     }
 
     fun mult(vector: Vector) {
@@ -48,7 +48,7 @@ data class Vector(var x: Int, var y: Int) {
     }
 
     fun mag() : Double {
-        return sqrt((x * x + y * y).toDouble())
+        return sqrt((x * x + y * y))
     }
 
     fun dist(vector: Vector) : Double {

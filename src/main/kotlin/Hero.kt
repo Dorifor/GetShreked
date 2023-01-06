@@ -10,7 +10,7 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 class Hero(val pos: Vector, var size: Int) {
-    val speed = 10 // Max distance per tick
+    val speed: Double = 10.0 // Max distance per tick
     var coins = 0
     var health = 50
     var experience = 0
@@ -29,38 +29,44 @@ class Hero(val pos: Vector, var size: Int) {
 
     fun isColliding(e: Pickable): Boolean {
         // Computes the distance between the hero and the enemy
-        val distance = sqrt((pos.x - e.posX).toDouble().pow(2.0) + (pos.y - e.posY).toDouble().pow(2.0))
+        val distance = sqrt((pos.x - e.pos.x).pow(2.0) + (pos.y - e.pos.y).pow(2.0))
         // If the distance is less than the sum of the radius, the hero is colliding with the enemy
         return distance < (size / 2 + e.size / 2)
     }
 
     fun moveUp() {
-        pos.sub(Vector(0, speed))
+        pos.sub(Vector(0.0, speed))
     }
+
     fun moveDown() {
-        pos.add(Vector(0, speed))
+        pos.add(Vector(0.0, speed))
     }
+
     fun moveLeft() {
-        pos.sub(Vector(speed, 0))
+        pos.sub(Vector(speed, 0.0))
     }
+
     fun moveRight() {
-        pos.add(Vector(speed, 0))
+        pos.add(Vector(speed, 0.0))
     }
 
     fun moveUpLeft() {
-        val diagSpeed = (speed * cos(Math.PI / 4)).toInt()
+        val diagSpeed = (speed * cos(Math.PI / 4))
         pos.add(Vector(-diagSpeed, -diagSpeed))
     }
+
     fun moveUpRight() {
-        val diagSpeed = (speed * cos(Math.PI / 4)).toInt()
+        val diagSpeed = (speed * cos(Math.PI / 4))
         pos.add(Vector(diagSpeed, -diagSpeed))
     }
+
     fun moveDownLeft() {
-        val diagSpeed = (speed * cos(Math.PI / 4)).toInt()
+        val diagSpeed = (speed * cos(Math.PI / 4))
         pos.add(Vector(-diagSpeed, diagSpeed))
     }
+
     fun moveDownRight() {
-        val diagSpeed = (speed * cos(Math.PI / 4)).toInt()
+        val diagSpeed = (speed * cos(Math.PI / 4))
         pos.add(Vector(diagSpeed, diagSpeed))
     }
 }
