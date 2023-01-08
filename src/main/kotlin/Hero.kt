@@ -6,25 +6,37 @@ import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.cos
 import kotlin.math.pow
-import kotlin.math.sin
 import kotlin.math.sqrt
 
-class Hero(val pos: Vector, var size: Int) {
+enum class HeroState {
+    IDLE,
+    HURT
+}
+
+class Hero(var pos: Vector, var size: Int) {
     val speed: Double = 10.0 // Max distance per tick
     var coins = 0
     var health = 50
     var experience = 0
     var level = 1
     var speedFactor = 1.0
+    var attractDistance = 120
+    var maxHealth = 100
     val attacks = mutableListOf<Attack>()
+    var state = HeroState.IDLE
 
-    private val sprite: BufferedImage = ImageIO.read(File("src/main/resources/shrok.png"))
+    private val spriteIdle: BufferedImage = ImageIO.read(File("src/main/resources/shrok.png"))
+    private val spriteHurt: BufferedImage = ImageIO.read(File("src/main/resources/shrok_hurt.png"))
+
+    private var sprite = spriteIdle
 
     fun draw(g: Graphics2D) {
         val centerX = WINDOW_WIDTH / 2
         val centerY = WINDOW_HEIGHT / 2
         attacks.forEach { it.draw(this, g) }
+        sprite = if (state == HeroState.HURT) spriteHurt else spriteIdle
         g.drawImage(sprite, centerX - 16, centerY - 16, null)
+        state = HeroState.IDLE
     }
 
     fun isColliding(e: Pickable): Boolean {
@@ -34,39 +46,48 @@ class Hero(val pos: Vector, var size: Int) {
         return distance < (size / 2 + e.size / 2)
     }
 
+    fun hurt(damage: Int) {
+        state = HeroState.HURT
+        health = (health - damage).coerceIn(0..maxHealth)
+        if (health <= 0) {
+            // println("BOOM T MOR")
+            //    TODO: faire event de mort
+        }
+    }
+
     fun moveUp() {
-        pos.sub(Vector(0.0, speed))
+        pos.y -= speed
     }
 
     fun moveDown() {
-        pos.add(Vector(0.0, speed))
+        pos.y += speed
     }
 
     fun moveLeft() {
-        pos.sub(Vector(speed, 0.0))
+        pos.x -= speed
     }
 
     fun moveRight() {
-        pos.add(Vector(speed, 0.0))
+        pos.x += speed
     }
 
     fun moveUpLeft() {
         val diagSpeed = (speed * cos(Math.PI / 4))
-        pos.add(Vector(-diagSpeed, -diagSpeed))
+        pos += Vector(-diagSpeed, -diagSpeed)
     }
 
     fun moveUpRight() {
         val diagSpeed = (speed * cos(Math.PI / 4))
-        pos.add(Vector(diagSpeed, -diagSpeed))
+        pos += (Vector(diagSpeed, -diagSpeed))
     }
 
     fun moveDownLeft() {
         val diagSpeed = (speed * cos(Math.PI / 4))
-        pos.add(Vector(-diagSpeed, diagSpeed))
+        pos += (Vector(-diagSpeed, diagSpeed))
     }
 
     fun moveDownRight() {
         val diagSpeed = (speed * cos(Math.PI / 4))
-        pos.add(Vector(diagSpeed, diagSpeed))
+        pos += (Vector(diagSpeed, diagSpeed))
     }
 }

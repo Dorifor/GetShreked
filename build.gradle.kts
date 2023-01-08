@@ -12,6 +12,11 @@ repositories {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/net.java.jinput/jinput
+    implementation("net.java.jinput:jinput:2.0.7")
+    implementation("org.jetbrains:annotations:20.1.0")
+    implementation("org.jetbrains:annotations:20.1.0")
+
     testImplementation(kotlin("test"))
 }
 

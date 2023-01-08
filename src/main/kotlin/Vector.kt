@@ -1,59 +1,39 @@
-import kotlin.math.abs
-import kotlin.math.ceil
-import kotlin.math.sign
-import kotlin.math.sqrt
+class Vector(var x: Double, var y: Double) {
 
-data class Vector(var x: Double, var y: Double) {
-    fun add(vector: Vector) {
-        x += vector.x
-        y += vector.y
-    }
+    // default constructor
+    constructor(): this(0.0, 0.0)
 
-    fun sub(vector: Vector) {
-        x -= vector.x
-        y -= vector.y
-    }
+    // copy constructor
+    constructor(other: Vector): this(other.x, other.y)
 
-    fun mult(m: Double) {
-        val sx = sign(x.toDouble())
-        val sy = sign(y.toDouble())
-        x = (ceil(abs(x) * m) * sx)
-        y = (ceil(abs(y) * m) * sy)
-    }
+    // addition
+    operator fun plus(other: Vector) = Vector(x + other.x, y + other.y)
 
-    fun mult(vector: Vector) {
-        x *= vector.x
-        y *= vector.y
-    }
+    // subtraction
+    operator fun minus(other: Vector) = Vector(x - other.x, y - other.y)
 
+    // multiplication by a scalar
+    operator fun times(scalar: Double) = Vector(x * scalar, y * scalar)
+
+    // division by a scalar
+    operator fun div(scalar: Double) = Vector(x / scalar, y / scalar)
+
+    // dot product
+    fun dot(other: Vector) = x * other.x + y * other.y
+
+    fun distance(other: Vector): Double = (this - other).magnitude()
+
+    // length of the vector
+    fun magnitude() = Math.sqrt(x * x + y * y)
+
+    // normalize the vector
     fun normalize() {
-        if (this.mag() != 0.0) {
-            this.mult(1 / this.mag())
-        }
+        val m = magnitude()
+        x /= m
+        y /= m
     }
 
-    fun limit(max: Double) {
-        if (this.mag() > max) {
-            this.setMag(max)
-        }
-    }
-
-    fun setMag(mag: Double) {
-        this.normalize()
-        this.mult(mag)
-    }
-
-    fun copy() : Vector {
-        return Vector(x, y)
-    }
-
-    fun mag() : Double {
-        return sqrt((x * x + y * y))
-    }
-
-    fun dist(vector: Vector) : Double {
-        val copy = this.copy()
-        copy.sub(vector)
-        return copy.mag()
+    override fun toString(): String {
+        return "($x, $y)"
     }
 }

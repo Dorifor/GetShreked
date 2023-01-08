@@ -15,6 +15,9 @@ object GameBoard : JPanel() {
     val gameSessions = mutableListOf<GameSession>()
     val powerUps = mutableListOf<PowerUp>()
     val maps = mutableListOf<Map>()
+    var currentMapLimit = 0
+
+    var gamepad: Gamepad? = null
 
     const val FRAMES_PER_SEC = 60
     const val FRAME_IN_MSEC = 1000 / FRAMES_PER_SEC
@@ -29,6 +32,9 @@ object GameBoard : JPanel() {
     init {
         preferredSize = Dimension(WINDOW_WIDTH, WINDOW_HEIGHT)
         background = Color.white
+
+        gamepad = Gamepad()
+        gamepad?.init()
     }
 
     fun initBoard() {
@@ -84,4 +90,8 @@ object GameBoard : JPanel() {
 
     }
 
+    fun IntRange.convert(number: Int, target: IntRange): Int {
+        val ratio = number.toFloat() / (endInclusive - start)
+        return (ratio * (target.last - target.first)).toInt()
+    }
 }
