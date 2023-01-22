@@ -42,7 +42,7 @@ abstract class Enemy(
         // force.y += Random.nextInt(-80, 80)
         force -= pos
         force.normalize()
-        force *= 3.0
+        force *= speed
         frame++
 
         if (pos.distance(hero.pos) <= hero.size / 2 + size / 2) {
@@ -116,7 +116,7 @@ class BossEnemy(
 ) : Enemy(pos, damage, health, speed, size, sprite, attackInterval)
 
 
-class BaseEnemy(
+class SpriteEnemy(
     pos: Vector,
     health: Int,
     damage: Int,
@@ -124,14 +124,11 @@ class BaseEnemy(
     size: Double,
     sprite: BufferedImage,
     attackInterval: Double,
-    var color: Color
+    val idleSprite: BufferedImage,
+    val hurtSprite: BufferedImage
 ) : Enemy(pos, health, damage, speed, size, sprite, attackInterval) {
 
-    val idleSprite = ImageIO.read(File("src/main/resources/amogus_64.png"))
-    val hurtSprite: BufferedImage = ImageIO.read(File("src/main/resources/amogus_hurt_64.png"))
-
     override fun draw(graphics: Graphics, hero: Hero) {
-        graphics.color = color
         sprite = when (state) {
             EnemyState.IDLE -> idleSprite
             EnemyState.HURT -> hurtSprite

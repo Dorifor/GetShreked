@@ -44,7 +44,7 @@ data class GamepadState(
 }
 
 class Gamepad {
-    private var controller: Controller? = null
+    var controller: Controller? = null
 
     private var STICK_TRESHOLD: Double = 0.25
 

@@ -1,5 +1,7 @@
 import GameBoard.WINDOW_HEIGHT
 import GameBoard.WINDOW_WIDTH
+import GameBoard.initDeathMenu
+import GameBoard.timer
 import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 import java.io.File
@@ -16,14 +18,17 @@ enum class HeroState {
 class Hero(var pos: Vector, var size: Int) {
     val speed: Double = 10.0 // Max distance per tick
     var coins = 0
-    var health = 50
     var experience = 0
     var level = 1
     var speedFactor = 1.0
     var attractDistance = 120
     var maxHealth = 100
+    // var health = maxHealth
+    var health = 0
     val attacks = mutableListOf<Attack>()
     var state = HeroState.IDLE
+    // var xpToNextLevel = 30
+    var xpToNextLevel = 5
 
     private val spriteIdle: BufferedImage = ImageIO.read(File("src/main/resources/shrok.png"))
     private val spriteHurt: BufferedImage = ImageIO.read(File("src/main/resources/shrok_hurt.png"))
@@ -33,7 +38,7 @@ class Hero(var pos: Vector, var size: Int) {
     fun draw(g: Graphics2D) {
         val centerX = WINDOW_WIDTH / 2
         val centerY = WINDOW_HEIGHT / 2
-        attacks.forEach { it.draw(this, g) }
+        attacks.filter { it.level != 0 }.forEach { it.draw(this, g) }
         sprite = if (state == HeroState.HURT) spriteHurt else spriteIdle
         g.drawImage(sprite, centerX - 16, centerY - 16, null)
         state = HeroState.IDLE
@@ -50,9 +55,18 @@ class Hero(var pos: Vector, var size: Int) {
         state = HeroState.HURT
         health = (health - damage).coerceIn(0..maxHealth)
         if (health <= 0) {
-            // println("BOOM T MOR")
-            //    TODO: faire event de mort
+            timer.stop()
+            initDeathMenu()
         }
+    }
+
+    fun levelUp() {
+        val extra = experience - xpToNextLevel
+        experience = extra
+        maxHealth += 15
+        health = maxHealth
+        level++
+        xpToNextLevel = 15 * level +  30
     }
 
     fun moveUp() {

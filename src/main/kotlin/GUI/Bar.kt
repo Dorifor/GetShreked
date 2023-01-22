@@ -1,17 +1,23 @@
+package GUI
+
+import GUIElement
+import GameBoard.WINDOW_HEIGHT
+import GameBoard.WINDOW_WIDTH
 import GameBoard.convert
+import GameBoard.mouseClicked
+import GameBoard.mouseReleased
+import Hero
 import java.awt.Color
 import java.awt.Graphics
 import java.awt.Point
+import javax.swing.JLabel
+import kotlin.collections.Map
 
-interface GUIElement {
-    fun update()
-    fun draw(graphics: Graphics)
-}
 
 abstract class Bar(
     val pos: Point,
     private val width: Int,
-    private val height: Int,
+    val height: Int,
     var value: Int = 0,
     var valueMax: Int = 100,
     private val border: Int = 2,
@@ -63,6 +69,7 @@ class HealthBar(
 
     override fun update() {
         value = hero?.health ?: 0
+        valueMax = hero?.maxHealth ?: valueMax
     }
 }
 
@@ -81,6 +88,7 @@ class ExperienceBar(
     var hero: Hero? = null
 
     override fun update() {
+        valueMax = hero?.xpToNextLevel ?: 30
         value = hero?.experience ?: 0
     }
 }
